@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Kris AI</title>
+
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: radial-gradient(circle at top, #0a0f1f, #000000);
+      font-family: "Poppins", sans-serif;
+      color: white;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* ---------- TOP BUTTONS ---------- */
+    .top-buttons {
+      position: absolute;
+      top: 25px;
+      right: 30px;
+      display: flex;
+      gap: 15px;
+      z-index: 9;
+    }
+
+    .btn {
+      padding: 15px 30px;
+      border: none;
+      border-radius: 40px;
+      cursor: pointer;
+      font-size: 17px;
+      font-weight: 600;
+      background: #1f2937;
+      color: white;
+      transition: 0.25s;
+    }
+
+    .btn:hover { transform: scale(1.15); }
+    .start:hover { background: #00c853; }
+    .stop:hover { background: #ff1744; }
+    .exit:hover { background: #7e57c2; }
+    .showchat:hover { background: #0288d1; }
+
+    /* ---------- CHAT HISTORY PANEL ---------- */
+    .chat-history {
+      position: absolute;
+      top: 90px;
+      right: 30px;
+      width: 350px;
+      height: 70vh;
+      background: rgba(15, 23, 42, 0.85);
+      border-radius: 20px;
+      padding: 20px;
+      overflow-y: auto;
+      display: none;
+      box-shadow: 0 0 20px #0ea5e9;
+    }
+
+    .chat-item {
+      margin-bottom: 15px;
+      background: #1e293b;
+      padding: 10px 15px;
+      border-radius: 12px;
+    }
+
+    .chat-user { color: #60a5fa; font-weight: 600; }
+    .chat-kris { color: #34d399; font-weight: 600; }
+
+    /* ---------- CENTER AREA ---------- */
+    .center-area {
+      position: absolute;
+      top: 45%;
+      left: 50%;
+      transform: translate(-50%, -55%);
+      text-align: center;
+    }
+
+    /* ---------- NEW SUPER STYLISH SPHERE ---------- */
+    .ai-orb {
+      width: 360px;
+      height: 360px;
+      border-radius: 50%;
+      position: relative;
+      background: radial-gradient(circle at 40% 40%, #00eaff, #003bff, #000428 90%);
+      box-shadow:
+        0 0 60px rgba(0, 217, 255, 0.8),
+        0 0 120px rgba(0, 140, 255, 0.5),
+        inset 0 0 45px #00c8ff;
+      animation: pulse 4s infinite ease-in-out;
+      overflow: hidden;
+    }
+
+    /* Rotating light layer */
+    .ai-orb::before {
+      content: "";
+      position: absolute;
+      width: 220%;
+      height: 220%;
+      top: -60%;
+      left: -60%;
+      background: conic-gradient(
+        from 0deg,
+        rgba(0,255,255,0.35),
+        rgba(0,0,255,0.25),
+        rgba(0,255,255,0.35)
+      );
+      filter: blur(55px);
+      animation: rotateEnergy 7s linear infinite;
+    }
+
+    /* Electric rings */
+    .ai-orb::after {
+      content: "";
+      position: absolute;
+      inset: 20px;
+      border-radius: 50%;
+      border: 3px solid rgba(0, 200, 255, 0.35);
+      animation: ringGlow 2s infinite alternate;
+      box-shadow:
+        0 0 25px rgba(0, 255, 255, 0.5),
+        inset 0 0 25px rgba(0, 255, 255, 0.5);
+    }
+
+    @keyframes rotateEnergy {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.09); }
+    }
+
+    @keyframes ringGlow {
+      from { opacity: 0.3; transform: scale(1); }
+      to   { opacity: 0.9; transform: scale(1.08); }
+    }
+
+    /* ---------- BOTTOM CHAT BAR ---------- */
+    .chat-bar {
+      position: absolute;
+      bottom: 40px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80%;
+      display: flex;
+      gap: 15px;
+      align-items: center;
+    }
+
+    .mic-btn {
+      width: 65px;
+      height: 65px;
+      border-radius: 50%;
+      background: #2563eb;
+      font-size: 30px;
+      border: none;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .mic-btn:hover {
+      transform: scale(1.15);
+      box-shadow: 0 0 20px #3b82f6;
+    }
+
+    .lang-select {
+      padding: 15px 20px;
+      background: #1f2937;
+      color: white;
+      border: 2px solid #00ffff;
+      border-radius: 40px;
+      font-size: 16px;
+      font-weight: 600;
+      outline: none;
+      cursor: pointer;
+      transition: 0.25s;
+    }
+
+    .lang-select:hover {
+      transform: scale(1.05);
+      background: #2a3a4a;
+    }
+
+    input {
+      flex: 1;
+      padding: 20px;
+      background: #0f172a;
+      color: white;
+      border-radius: 30px;
+      border: none;
+      outline: none;
+      font-size: 18px;
+    }
+
+    .send-btn {
+      padding: 20px 35px;
+      border-radius: 35px;
+      background: #3b82f6;
+      border: none;
+      color: white;
+      font-size: 20px;
+      cursor: pointer;
+      transition: .25s;
+    }
+
+    .send-btn:hover {
+      transform: scale(1.1);
+      box-shadow: 0 0 20px #3b82f6;
+    }
+
+  </style>
+</head>
+
+<body>
+
+  <!-- TOP BUTTONS -->
+  <div class="top-buttons">
+    <button class="btn start" onclick="startInteraction()">START</button>
+    <button class="btn stop" onclick="stopInteraction()">STOP</button>
+    <button class="btn exit" onclick="exitApp()">EXIT</button>
+    <button class="btn showchat" onclick="toggleChat()">SHOW CHAT</button>
+  </div>
+
+  <!-- CHAT HISTORY -->
+  <div class="chat-history" id="chatHistory"></div>
+
+  <!-- CENTER SPHERE -->
+  <div class="center-area">
+    <div class="ai-orb"></div>
+    <h1 style="margin-top: 35px; font-size: 42px; letter-spacing: 6px;">KRIS AI</h1>
+  </div>
+
+  <!-- CHAT BAR -->
+  <div class="chat-bar">
+    <button class="mic-btn" onclick="toggleConversationMode()">🎤</button>
+    <select class="lang-select" id="languageSelect">
+      <option value="en-US">English (US)</option>
+      <option value="es-ES">Spanish (Spain)</option>
+      <option value="fr-FR">French (France)</option>
+      <option value="de-DE">German (Germany)</option>
+      <option value="it-IT">Italian (Italy)</option>
+      <option value="pt-BR">Portuguese (Brazil)</option>
+      <option value="zh-CN">Chinese (Mandarin)</option>
+      <option value="ja-JP">Japanese</option>
+      <option value="ko-KR">Korean</option>
+      <option value="ar-SA">Arabic (Saudi Arabia)</option>
+      <option value="hi-IN">Hindi (India)</option>
+      <option value="mr-IN">Marathi (India)</option>
+    </select>
+    <input type="text" id="message" placeholder="Talk to Kris…"/>
+    <button class="send-btn" onclick="sendMessage()">SEND</button>
+  </div>
+
+<script>
+// API Keys (replace with yours)
+const GEMINI_API_KEY = "AIzaSyALsRu2F_FU7nX-8rtl3aRVzvZbUUfysM0"; // Provided Gemini API key
+const WEATHER_API_KEY = "YOUR_WEATHER_KEY"; // Get from OpenWeatherMap
+const NEWS_API_KEY = "YOUR_NEWS_KEY"; // Get from NewsAPI
+
+let interactionEnabled = true;
+let vocalMode = false; // Tracks if in vocal mode (starts in message mode)
+
+// Language mapping for prompts (full name for Gemini)
+const languageNames = {
+  "en-US": "English",
+  "es-ES": "Spanish",
+  "fr-FR": "French",
+  "de-DE": "German",
+  "it-IT": "Italian",
+  "pt-BR": "Portuguese",
+  "zh-CN": "Chinese",
+  "ja-JP": "Japanese",
+  "ko-KR": "Korean",
+  "ar-SA": "Arabic",
+  "hi-IN": "Hindi",
+  "mr-IN": "Marathi"
+};
+
+/* -------- CHAT PANEL ------- */
+function toggleChat() {
+  let panel = document.getElementById("chatHistory");
+  panel.style.display = panel.style.display === "block" ? "none" : "block";
+}
+
+function addToChat(who, text) {
+  let div = document.createElement("div");
+  div.className = "chat-item";
+
+  let label = who === "You" ? "chat-user" : "chat-kris";
+
+  div.innerHTML = `<div class="${label}">${who}</div><div>${text}</div>`;
+
+  document.getElementById("chatHistory").appendChild(div);
+  document.getElementById("chatHistory").scrollTop = document.getElementById("chatHistory").scrollHeight;
+}
+
+/* -------- SPEAK FUNCTION USING Web Speech API (Multi-Language, Adjusted Speed) ------- */
+function speak(text, lang = null) {
+  text = text.replace(/\n/g, ' ').replace(/\r/g, ' ');
+  console.log(`[Kris Speaking] ${text}`);
+  if ('speechSynthesis' in window) {
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.rate = 1.0; // Reduced speed for natural pace
+    if (lang) {
+      utterance.lang = lang;
+    } else {
+      // Use selected language from dropdown
+      const selectedLang = document.getElementById("languageSelect").value;
+      utterance.lang = selectedLang;
+    }
+    window.speechSynthesis.speak(utterance);
+  } else {
+    console.log("TTS not supported in this browser.");
+  }
+}
+
+/* -------- MIC BUTTON FUNCTION (Toggle Mode) ------- */
+function toggleConversationMode() {
+  const lang = document.getElementById("languageSelect").value;
+  if (vocalMode) {
+    speak("Switching to message conversation", lang);
+    vocalMode = false;
+  } else {
+    speak("Switch to vocal conversation", lang);
+    vocalMode = true;
+  }
+}
+
+/* -------- GEMINI AI (Language-Specific Responses) ------- */
+async function getResponse(prompt) {
+  const selectedLang = document.getElementById("languageSelect").value;
+  const langName = languageNames[selectedLang] || "English";
+  const langPrompt = `Respond in ${langName}: ${prompt}`;
+
+  const url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent";
+  const params = new URLSearchParams({ key: GEMINI_API_KEY });
+  const data = {
+    contents: [{
+      parts: [{ text: langPrompt }]
+    }]
+  };
+  try {
+    const res = await fetch(`${url}?${params}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+    const response = await res.json();
+    if (response.candidates && response.candidates.length > 0) {
+      return response.candidates[0].content.parts[0].text;
+    } else {
+      return "I couldn't generate a response. Please check your API key or try again.";
+    }
+  } catch (e) {
+    console.error("Gemini API Error:", e);
+    return `Gemini Error: ${e.message}. Please check your internet, API key, or model availability.`;
+  }
+}
+
+/* -------- WEATHER ------- */
+async function getWeather(city) {
+  if (!WEATHER_API_KEY || WEATHER_API_KEY === "YOUR_WEATHER_KEY") {
+    return "Weather API key not set. Please add a valid OpenWeatherMap API key.";
+  }
+  const url = `http://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${WEATHER_API_KEY}&units=metric`;
+  try {
+    const res = await fetch(url);
+    const data = await res.json();
+    if (data.cod !== 200) {
+      return "I could not find the weather for that location. Check the city name.";
+    }
+    const temp = data.main.temp;
+    const desc = data.weather[0].description;
+    return `The temperature in ${city} is ${temp} degrees Celsius with ${desc}.`;
+  } catch (e) {
+    return `Weather Error: ${e.message}`;
+  }
+}
+
+/* -------- NEWS ------- */
+async function getNews() {
+  if (!NEWS_API_KEY || NEWS_API_KEY === "YOUR_NEWS_KEY") {
+    return "News API key not set. Please add a valid NewsAPI key.";
+  }
+  const url = `https://newsapi.org/v2/top-headlines?country=us&apiKey=${NEWS_API_KEY}`;
+  try {
+    const res = await fetch(url);
+    const data = await res.json();
+    if (data.status !== "ok") {
+      return "I cannot fetch news right now. Check your API key.";
+    }
+    const top3 = data.articles.slice(0, 3).map(a => a.title);
+    return "Top news: " + top3.join("; ");
+  } catch (e) {
+    return `News Error: ${e.message}`;
+  }
+}
+
+/* -------- PC CONTROL (Limited in Web) ------- */
+function controlPC(cmd) {
+  // Cannot control host PC from browser for security reasons.
+  if (cmd.includes("open chrome")) {
+    return "Opening Chrome is not supported in web version.";
+  }
+  if (cmd.includes("open notepad")) {
+    return "Opening Notepad is not supported in web version.";
+  }
+  if (cmd.includes("shutdown")) {
+    return "Shutdown is not supported in web version.";
+  }
+  if (cmd.includes("type")) {
+    return "Typing is not supported in web version.";
+  }
+  if (cmd.includes("click")) {
+    return "Clicking is not supported in web version.";
+  }
+  return "I did not understand the command.";
+}
+
+/* -------- GUI FUNCTIONS ------- */
+function startInteraction() {
+  interactionEnabled = true;
+  addToChat("Kris", "Interaction started. How can I help? 🤖");
+  speak("Interaction started.");
+}
+
+function stopInteraction() {
+  interactionEnabled = false;
+  // Cancel any ongoing speech
+  if ('speechSynthesis' in window) {
+    window.speechSynthesis.cancel();
+  }
+  addToChat("Kris", "Interaction paused. ⏸️");
+  speak("Interaction paused.");
+}
+
+function exitApp() {
+  speak("Goodbye");
+  // Delay to allow speech to finish before closing
+  setTimeout(() => {
+    window.close();
+  }, 2000); // 2 seconds delay
+}
+
+/* -------- SEND MESSAGE ------- */
+async function sendMessage() {
+  if (!interactionEnabled) return;
+
+  const input = document.getElementById("message");
+  const text = input.value.trim().toLowerCase();
+  if (!text) return;
+
+  addToChat("You", input.value);
+  input.value = "";
+
+  if (text === "exit") {
+    exitApp();
+    return;
+  }
+
+  let reply = "";
+
+  // --- NEW FEATURE: WHO MADE YOU ---
+  if (
+    text.includes("who made you") ||
+    text.includes("who created you") ||
+    text.includes("your creator")
+  ) {
+    reply = "I am an AI assistant created by Om Chavhan.";
+  }
+
+  else if (text.includes("weather")) {
+    const city = text.split("in").pop().trim();
+    reply = await getWeather(city);
+  }
+
+  else if (text.includes("news")) {
+    reply = await getNews();
+  }
+
+  // --- PC CONTROL (works only with Python server) ---
+  else if (["open", "shutdown", "type", "click"].some(x => text.includes(x))) {
+    reply = await controlPC(text);
+  }
+
+  else {
+  reply = await getResponse(text);
+
+  // --- OVERRIDE GEMINI'S DEFAULT IDENTITY ---
+  reply = reply
+  .replace(/i am a large language model, trained by google\.?/gi,
+           "Kris, a powerful AI assistant created by Om Chavhan.")
+  .replace(/i’m a large language model trained by google\.?/gi,
+           "Kris, a powerful AI assistant created by Om Chavhan.")
+  .replace(/i am an ai created by google\.?/gi,
+           "Kris, a powerful AI assistant created by Om Chavhan.")
+  .replace(/i am a google ai model\.?/gi,
+           "Kris, a powerful AI assistant created by Om Chavhan.");
+  }
+
+
+  if (!reply) reply = "Sorry, I did not get that.";
+  reply = reply.replace(/\*/g, "");
+
+addToChat("Kris", reply);
+
+// Pronounce Om as Ohm in any language
+let voiceText = reply.replace(/\bOm\b/gi, "Ohm");
+
+speak(voiceText);
+}
+document.getElementById("message").addEventListener("keydown", e => {
+  if (e.key === "Enter") sendMessage();
+});
+
+
+// Initialize
+addToChat("Kris", "I am Kris. How can I help you? 🤖");
+speak("I am Kris. How can I help you?");
+</script>
+
+</body>
+</html>
